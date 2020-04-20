@@ -180,7 +180,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         for iface in ret:
             try:
                 return iface['address']
-            except NameError:
+            except:
                 return None
 
     def _get_vm_config(self, node, vmid, vmtype, name):
