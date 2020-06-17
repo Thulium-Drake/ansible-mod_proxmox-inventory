@@ -186,6 +186,14 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
     def _get_vm_config(self, node, vmid, vmtype, name):
         ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/config" % (self.proxmox_url, node, vmtype, vmid))
 
+        vmid_key = 'vmid'
+        vmid_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), vmid_key.lower()))
+        self.inventory.set_variable(name, vmid_key, vmid)
+
+        vmtype_key = 'vmtype'
+        vmtype_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), vmtype_key.lower()))
+        self.inventory.set_variable(name, vmtype_key, vmtype)
+
         for config in ret:
             key = config
             key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), key.lower()))
