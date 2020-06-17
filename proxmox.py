@@ -207,7 +207,11 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     value = value
                 # split off strings with commas to a dict
                 else:
-                    value = dict(key.split("=") for key in value.split(","))
+                    # skip over any keys that cannot be processed
+                    try:
+                        value = dict(key.split("=") for key in value.split(","))
+                    except:
+                        continue
 
                 self.inventory.set_variable(name, key, value)
             except NameError:
