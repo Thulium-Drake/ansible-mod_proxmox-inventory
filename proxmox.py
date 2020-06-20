@@ -9,7 +9,7 @@ DOCUMENTATION = '''
     name: proxmox
     plugin_type: inventory
     short_description: proxmox inventory source
-    version_added: "2.7"
+    version_added: "1.0.0"
     requirements:
         - requests >= 1.1
     description:
@@ -24,15 +24,19 @@ DOCUMENTATION = '''
         description: the name of this plugin, it should alwys be set to 'proxmox' for this plugin to recognize it as it's own.
         required: True
         choices: ['proxmox']
+        type: str
       url:
         description: url to proxmox
         default: 'http://localhost:8006'
+        type: str
       user:
         description: proxmox authentication user
         required: True
+        type: str
       password:
         description: proxmox authentication password
         required: True
+        type: str
       validate_certs:
         description: verify SSL certificate if using https
         type: boolean
@@ -40,12 +44,15 @@ DOCUMENTATION = '''
       group_prefix:
         description: prefix to apply to proxmox groups
         default: proxmox_
+        type: str
       facts_prefix:
         description: prefix to apply to vm config facts
         default: proxmox_
+        type: str
       want_facts:
         description: gather vm configuration facts
         default: False
+        type: bool
 '''
 
 EXAMPLES = '''
@@ -59,13 +66,12 @@ validate_certs: False
 
 import re
 
-from collections import MutableMapping
+from ansible.module_utils.common._collections_compat import MutableMapping
 from distutils.version import LooseVersion
 
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable
 from ansible.module_utils.six.moves.urllib.parse import urlencode
-
 
 # 3rd party imports
 try:
@@ -180,7 +186,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         for iface in ret:
             try:
                 return iface['address']
-            except:
+            except Exception:
                 return None
 
     def _get_vm_config(self, node, vmid, vmtype, name):
@@ -210,7 +216,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     # skip over any keys that cannot be processed
                     try:
                         value = dict(key.split("=") for key in value.split(","))
-                    except:
+                    except Exception:
                         continue
 
                 self.inventory.set_variable(name, key, value)
